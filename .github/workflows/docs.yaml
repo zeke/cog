@@ -1,19 +1,24 @@
-name: Deploy docs
-
+name: Deploy docs via GitHub Pages
 on:
   push:
     branches:
       - main
+
 jobs:
-  deploy:
+  build:
+    name: Deploy docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.x
-      - run: |
-          pip install mkdocs-material
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Copy README and CONTRIBUTING to docs dir
+        run: |
           sed 's/docs\///g' README.md > ./docs/README.md
           cp CONTRIBUTING.md ./docs/
-          mkdocs gh-deploy --force
+
+      - name: Deploy to GitHub Pages
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # CUSTOM_DOMAIN: docs.cog.run
